@@ -10,11 +10,11 @@
 	import { blocked_messages } from './data/blocked_messages.js';
 	const messages = writable([]); 
 
-	// BOT LOGIN (account info)
-	const botID = [
+	// BOT LOGIN (your info here)
+	const botID = {
 		'usr': 'botname', 
 		'pwd': 'from https://twitchapps.com/tmi', 
-	]
+	}
 
 	let autoscroll = true
 	let messageBox; // HTML element
