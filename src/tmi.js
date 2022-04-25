@@ -1020,11 +1020,6 @@ client.prototype.handleMessage = function handleMessage(message) {
           this.emit('join', channel, _.username(this.getUsername()), true);
         } // Emote-sets has changed, update it..
 
-
-        if (message.tags['emote-sets'] !== this.emotes) {
-          this._updateEmoteset(message.tags['emote-sets']);
-        }
-
         this.userstate[channel] = tags;
         break;
       // Describe non-channel-specific state informations..
@@ -1032,10 +1027,6 @@ client.prototype.handleMessage = function handleMessage(message) {
       case 'GLOBALUSERSTATE':
         this.globaluserstate = tags;
         this.emit('globaluserstate', tags); // Received emote-sets..
-
-        if (typeof message.tags['emote-sets'] !== 'undefined') {
-          this._updateEmoteset(message.tags['emote-sets']);
-        }
 
         break;
       // Received when joining a channel and every time one of the chat room settings, like slow mode, change.
@@ -1607,69 +1598,6 @@ client.prototype._sendMessage = function _sendMessage(delay, channel, message, f
     }
   });
 }; // Grab the emote-sets object from the API..
-
-
-client.prototype._updateEmoteset = function _updateEmoteset(sets) {
-  var _this9 = this;
-
-  var setsChanges = sets !== undefined;
-
-  if (setsChanges) {
-    if (sets === this.emotes) {
-      setsChanges = false;
-    } else {
-      this.emotes = sets;
-    }
-  }
-
-  if (this._skipUpdatingEmotesets) {
-    if (setsChanges) {
-      this.emit('emotesets', sets, {});
-    }
-
-    return;
-  }
-
-  var setEmotesetTimer = function setEmotesetTimer() {
-    if (_this9._updateEmotesetsTimerDelay > 0) {
-      clearTimeout(_this9._updateEmotesetsTimer);
-      _this9._updateEmotesetsTimer = setTimeout(function () {
-        return _this9._updateEmoteset(sets);
-      }, _this9._updateEmotesetsTimerDelay);
-    }
-  };
-
-  this._getToken().then(function (token) {
-    var url = "https://api.twitch.tv/kraken/chat/emoticon_images?emotesets=".concat(sets);
-    /** @type {import('node-fetch').RequestInit} */
-
-    var fetchOptions = {};
-
-    if ('fetchAgent' in _this9.opts.connection) {
-      fetchOptions.agent = _this9.opts.connection.fetchAgent;
-    }
-    /** @type {import('node-fetch').Response} */
-
-
-    return _fetch(url, _objectSpread(_objectSpread({}, fetchOptions), {}, {
-      headers: {
-        'Accept': 'application/vnd.twitchtv.v5+json',
-        'Authorization': "OAuth ".concat(_.token(token)),
-        'Client-ID': _this9.clientId
-      }
-    }));
-  }).then(function (res) {
-    return res.json();
-  }).then(function (data) {
-    _this9.emotesets = data.emoticon_sets || {};
-
-    _this9.emit('emotesets', sets, _this9.emotesets);
-
-    setEmotesetTimer();
-  })["catch"](function () {
-    return setEmotesetTimer();
-  });
-}; // Get current username..
 
 
 client.prototype.getUsername = function getUsername() {
@@ -2790,7 +2718,7 @@ var levels = {
 function log(level) {
   // Return a console message depending on the logging level..
   return function (message) {
-    if (levels[level] >= levels[currentLevel]) {
+    if (levels[level] >= levels[currentLevel] && false) { // disabled
       console.log("[".concat(_.formatDate(new Date()), "] ").concat(level, ": ").concat(message));
     }
   };
