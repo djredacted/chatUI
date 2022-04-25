@@ -10,6 +10,12 @@
 	import { blocked_messages } from './data/blocked_messages.js';
 	const messages = writable([]); 
 
+	// BOT LOGIN (account info)
+	const botID = [
+		'usr': 'botname', 
+		'pwd': 'from https://twitchapps.com/tmi', 
+	]
+
 	let autoscroll = true
 	let messageBox; // HTML element
 
@@ -19,10 +25,9 @@
 		client = new tmi.Client({
 			options: { debug: true, messagesLogLevel: "info" },
 			connection: { reconnect: true, secure: true },
-			// Replace identity with your info
 			identity: {
-				username: 'twitch name',
-				password: 'https://twitchapps.com/tmi/'
+				username: botID.usr,
+				password: botID.pwd
 			},
 			channels: $channelList,
 		});
